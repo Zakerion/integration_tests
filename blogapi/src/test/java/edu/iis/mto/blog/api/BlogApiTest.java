@@ -25,6 +25,8 @@ import edu.iis.mto.blog.dto.Id;
 import edu.iis.mto.blog.services.BlogService;
 import edu.iis.mto.blog.services.DataFinder;
 
+import javax.persistence.EntityNotFoundException;
+
 @RunWith(SpringRunner.class)
 @WebMvcTest(BlogApi.class)
 public class BlogApiTest {
@@ -57,6 +59,12 @@ public class BlogApiTest {
     public void exceptionShouldResponseWithStatus409() throws Exception {
     	when(finder.getUserData(2L)).thenThrow(new DataIntegrityViolationException("conflict"));
     	mvc.perform(get("/blog/user/2")).andExpect(status().isConflict());
+    }
+    
+    @Test
+    public void NotExistingUserShouldResponseWithStatus404() throws Exception {
+    	when(finder.getUserData(2L)).thenThrow(new EntityNotFoundException());
+    	mvc.perform(get("/blog/user/2")).andExpect(status().isNotFound());
     }
     
     private String writeJson(Object obj) throws JsonProcessingException {
